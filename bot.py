@@ -18,7 +18,7 @@ bot.
 import logging
 
 import sqlite3
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -43,40 +43,46 @@ def start(bot,  update):
     update.message.reply_text(hello_message)
 
 
+def cancel(bot, update):
+    update.message.reply_text('فرستادن پیام لغو شد.')
+    return ConversationHandler.END
+
+
+# states
+msg = range(1)
+
+def callback(bot, update):
+    update.message.reply_text("با تشکر")
+    return ConversationHandler.END
+
 def help(bot,  update):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
-
-
-def echo(bot, update):
-    """Echo the user message."""
-    
-
+    update.message.reply_text('Help!')  
 
 def error(bot, update):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def get_spam(bot, update):
-    msg = bot.send_message(update.message.chat_id, text="لطفا پیام تبلیغاتی رو وارد کن.")
-    update.message.reply_text()
+    update.message.reply_text("لطفا پیام تبلیغاتی رو وارد کن.")
+    return msg
 
 def get_nonspam(bot, update):
     update.message.reply_text("لطفا پیام غیرتبلیغاتی رو وارد کن.")
 
-def wait_for_message():
-    msg = update.message
+# def insert_message():
+#     msg = update.message
     
-    # Insert a row of data
-    query = f"INSERT INTO message VALUES ('{msg.id}','{msg.text}','spam', '1', null, '{msg.date}')"
-    c.execute(query)
+#     # Insert a row of data
+#     query = f"INSERT INTO message VALUES ('{msg.id}','{msg.text}','spam', '1', null, '{msg.date}')"
+#     c.execute(query)
 
-    # Save (commit) the changes
-    conn.commit()
+#     # Save (commit) the changes
+#     conn.commit()
 
-    # We can also close the connection if we are done with it.
-    # Just be sure any changes have been committed or they will be lost.
-    conn.close()
+#     # We can also close the connection if we are done with it.
+#     # Just be sure any changes have been committed or they will be lost.
+#     conn.close()
 
 def main():
     """Start the bot."""
@@ -88,14 +94,18 @@ def main():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('spam', get_spam), ],
+        states={msg: [MessageHandler(Filters.text, callback)]},
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+
+    dp.add_handler(conv_handler)
+
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("spam", get_spam))
     dp.add_handler(CommandHandler("nonspam", get_nonspam))
-
-    # on noncommand i.e message - echo the message on Telegram
-    # dp.add_handler(MessageHandler(Filters.text, echo))
 
     # log all errors
     dp.add_error_handler(error)
