@@ -17,6 +17,7 @@ bot.
 
 import logging
 
+import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 # Enable logging
@@ -25,35 +26,64 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+conn = sqlite3.connect('pashizak.db')
+
+
+c = conn.cursor()
+# c.execute('''CREATE TABLE message
+#              (id int, message text, label text, user_id int, is_approved bool, date text)''')
+
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
+def start(bot,  update):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    user = update.message.from_user
+    hello_message = f"سلام {user.first_name} \n برای ثبت پیام تبلیغاتی دکمه /spam و برای ثبت پیام غیرتبلیغاتی دکمه /nonspam رو بزن"
+    update.message.reply_text(hello_message)
 
 
-def help(update, context):
+def help(bot,  update):
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def echo(update, context):
+def echo(bot, update):
     """Echo the user message."""
-    update.message.reply_text(update.message.text)
+    
 
 
-def error(update, context):
+def error(bot, update):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
+def get_spam(bot, update):
+    msg = bot.send_message(update.message.chat_id, text="لطفا پیام تبلیغاتی رو وارد کن.")
+    update.message.reply_text()
+
+def get_nonspam(bot, update):
+    update.message.reply_text("لطفا پیام غیرتبلیغاتی رو وارد کن.")
+
+def wait_for_message():
+    msg = update.message
+    
+    # Insert a row of data
+    query = f"INSERT INTO message VALUES ('{msg.id}','{msg.text}','spam', '1', null, '{msg.date}')"
+    c.execute(query)
+
+    # Save (commit) the changes
+    conn.commit()
+
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    conn.close()
 
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1243042394:AAH0iq8zYlWLswgAN85TQxTqaYSQJ5SRuWU", use_context=True)
+    updater = Updater("TOKEN", use_context=False)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -61,9 +91,11 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("spam", get_spam))
+    dp.add_handler(CommandHandler("nonspam", get_nonspam))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    # dp.add_handler(MessageHandler(Filters.text, echo))
 
     # log all errors
     dp.add_error_handler(error)
