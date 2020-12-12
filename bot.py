@@ -26,10 +26,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-conn = sqlite3.connect('pashizak.db')
-
-
-c = conn.cursor()
+def cursor():
+    with sqlite3.connect('pashizak.db') as conn:
+        return conn
 # c.execute('''CREATE TABLE message
 #              (id int, message text, label text, user_id int, is_approved bool, date text)''')
 
@@ -52,7 +51,8 @@ def cancel(bot, update):
 msg = range(1)
 
 def callback(bot, update):
-    update.message.reply_text("با تشکر")
+    insert_message(update.message)
+    update.message.reply_text("با تشکر پیام شما ثبت شد")
     return ConversationHandler.END
 
 def help(bot,  update):
@@ -70,26 +70,25 @@ def get_spam(bot, update):
 def get_nonspam(bot, update):
     update.message.reply_text("لطفا پیام غیرتبلیغاتی رو وارد کن.")
 
-# def insert_message():
-#     msg = update.message
-    
-#     # Insert a row of data
-#     query = f"INSERT INTO message VALUES ('{msg.id}','{msg.text}','spam', '1', null, '{msg.date}')"
-#     c.execute(query)
+def insert_message(msg):  
+    c = cursor() 
+    # Insert a row of data
+    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','spam', '1', null, '{msg.date}')"
+    c.cursor().execute(query)
 
-#     # Save (commit) the changes
-#     conn.commit()
+    # Save (commit) the changes
+    c.commit()
 
-#     # We can also close the connection if we are done with it.
-#     # Just be sure any changes have been committed or they will be lost.
-#     conn.close()
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    c.close()
 
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=False)
+    updater = Updater("1243042394:AAG9Dx140oUfmGGmJX_An8XdZSKvKOWAlBI", use_context=False)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
