@@ -15,7 +15,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import logging
+import os, logging
 
 import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
@@ -25,6 +25,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+PASHIZAK_TOKEN = os.getenv('PASHIZAK_TOKEN')
 
 def cursor():
     with sqlite3.connect('pashizak.db') as conn:
@@ -88,7 +90,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1243042394:AAG9Dx140oUfmGGmJX_An8XdZSKvKOWAlBI", use_context=False)
+    updater = Updater(PASHIZAK_TOKEN, use_context=False)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
