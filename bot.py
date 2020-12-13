@@ -1,22 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
-
-"""
-Simple Bot to reply to Telegram messages.
-
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import os, logging
-
 import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
@@ -31,23 +13,19 @@ PASHIZAK_TOKEN = os.getenv('PASHIZAK_TOKEN')
 def cursor():
     with sqlite3.connect('pashizak.db') as conn:
         return conn
-# c.execute('''CREATE TABLE message
-#              (id int, message text, label text, user_id int, is_approved bool, date text)''')
 
+def create_message_table():
+    c.execute('''CREATE TABLE message (id int, message text, label text, user_id int, is_approved bool, date text)''')
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
 def start(bot,  update):
     """Send a message when the command /start is issued."""
     user = update.message.from_user
     hello_message = f"سلام {user.first_name} \n برای ثبت پیام تبلیغاتی دکمه /spam و برای ثبت پیام غیرتبلیغاتی دکمه /nonspam رو بزن"
     update.message.reply_text(hello_message)
 
-
 def cancel(bot, update):
     update.message.reply_text('فرستادن پیام لغو شد.')
     return ConversationHandler.END
-
 
 # states
 msg = range(1)
@@ -74,25 +52,15 @@ def get_nonspam(bot, update):
 
 def insert_message(msg):  
     c = cursor() 
-    # Insert a row of data
+
     query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','spam', '1', null, '{msg.date}')"
     c.cursor().execute(query)
-
-    # Save (commit) the changes
     c.commit()
-
-    # We can also close the connection if we are done with it.
-    # Just be sure any changes have been committed or they will be lost.
     c.close()
 
 def main():
-    """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
     updater = Updater(PASHIZAK_TOKEN, use_context=False)
 
-    # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
     conv_handler = ConversationHandler(
@@ -103,20 +71,14 @@ def main():
 
     dp.add_handler(conv_handler)
 
-    # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("nonspam", get_nonspam))
 
-    # log all errors
     dp.add_error_handler(error)
 
-    # Start the Bot
     updater.start_polling()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
 
