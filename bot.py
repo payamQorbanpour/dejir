@@ -1,6 +1,9 @@
 import os, logging
 import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
