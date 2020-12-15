@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 PASHIZAK_TOKEN = os.getenv('PASHIZAK_TOKEN')
 
-def cursor():
+def db_connection():
     with sqlite3.connect('pashizak.db') as conn:
         return conn
 
@@ -57,7 +57,7 @@ def get_nonspam(bot, update):
     return msg
 
 def insert_spam(msg):  
-    c = cursor() 
+    c = db_connection() 
 
     query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','spam', '1', null, '{msg.date}')"
     c.cursor().execute(query)
@@ -65,7 +65,7 @@ def insert_spam(msg):
     c.close()
 
 def insert_nonspam(msg):  
-    c = cursor() 
+    c = db_connection() 
 
     query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','nonspam', '1', null, '{msg.date}')"
     c.cursor().execute(query)
