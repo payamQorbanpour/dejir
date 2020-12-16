@@ -11,10 +11,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-PASHIZAK_TOKEN = os.getenv('PASHIZAK_TOKEN')
+DEJIRBOT_TOKEN = os.getenv('DEJIRBOT_TOKEN')
 
 def db_connection():
-    with sqlite3.connect('pashizak.db') as conn:
+    with sqlite3.connect('dejirbot.db') as conn:
         return conn
 
 def create_message_table():
@@ -45,7 +45,7 @@ def nonspam_callback(bot, update):
 
 def help(bot,  update):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')  
+    update.message.reply_text('Help!')
 
 def error(bot, update):
     """Log Errors caused by Updates."""
@@ -59,16 +59,16 @@ def get_nonspam(bot, update):
     update.message.reply_text("لطفا پیام غیرتبلیغاتی رو وارد کن.")
     return msg
 
-def insert_spam(msg):  
-    c = db_connection() 
+def insert_spam(msg):
+    c = db_connection()
 
     query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','spam', '1', null, '{msg.date}')"
     c.cursor().execute(query)
     c.commit()
     c.close()
 
-def insert_nonspam(msg):  
-    c = db_connection() 
+def insert_nonspam(msg):
+    c = db_connection()
 
     query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','nonspam', '1', null, '{msg.date}')"
     c.cursor().execute(query)
@@ -76,7 +76,7 @@ def insert_nonspam(msg):
     c.close()
 
 def main():
-    updater = Updater(PASHIZAK_TOKEN, use_context=False)
+    updater = Updater(DEJIRBOT_TOKEN, use_context=False)
 
     dp = updater.dispatcher
 
