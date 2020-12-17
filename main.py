@@ -23,11 +23,17 @@ def create_message_table():
 def start(bot,  update):
     """Send a message when the command /start is issued."""
     user = update.message.from_user
-    hello_message = f"سلام {user.first_name} \n برای ثبت پیام تبلیغاتی دکمه /spam و برای ثبت پیام غیرتبلیغاتی دکمه /nonspam رو بزن"
-    update.message.reply_text(hello_message)
+    start_message = f"""سلام {user.first_name} \n
+     با این دکمه‌ها می‌تونی کارو شروع کنی:\n
+     ثبت پیام تبلیغاتی: /spam
+     ثبت پیام غیر تبلیغاتی: /nonspam
+
+     اگر هم نیاز به کمک یا اطلاعات بیشتر داری: /help"""
+    update.message.reply_text(start_message)
 
 def cancel(bot, update):
-    update.message.reply_text('فرستادن پیام لغو شد.')
+    cancel_message = 'فرستادن پیام لغو شد.'
+    update.message.reply_text(cancel_message)
     return ConversationHandler.END
 
 # states
@@ -35,28 +41,37 @@ msg = range(1)
 
 def spam_callback(bot, update):
     insert_spam(update.message)
-    update.message.reply_text("با تشکر پیام تبلیغاتی شما ثبت شد")
+    spam_submit_message = "با تشکر پیام تبلیغاتی شما ثبت شد"
+    update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
 def nonspam_callback(bot, update):
     insert_nonspam(update.message)
-    update.message.reply_text("با تشکر پیام غیرتبلیغاتی شما ثبت شد")
+    ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
+    update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
 
 def help(bot,  update):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    help_message = """
+    ثبت پیام تبلیغاتی: /spam
+    ثبت پیام غیر تبلیغاتی: /nonspam
+    آشنایی با هدف پروژه: /mission
+    """
+    update.message.reply_text(help_message)
 
 def error(bot, update):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def get_spam(bot, update):
-    update.message.reply_text("لطفا پیام تبلیغاتی رو وارد کن.")
+    get_spam_message = "لطفا پیام تبلیغاتی رو وارد کن."
+    update.message.reply_text(get_spam_message)
     return msg
 
 def get_nonspam(bot, update):
-    update.message.reply_text("لطفا پیام غیرتبلیغاتی رو وارد کن.")
+    get_ham_message = "لطفا پیام غیرتبلیغاتی رو وارد کن."
+    update.message.reply_text(get_ham_message)
     return msg
 
 def insert_spam(msg):
