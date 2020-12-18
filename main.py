@@ -28,7 +28,9 @@ def start(bot,  update):
      ثبت پیام تبلیغاتی: /spam
      ثبت پیام غیر تبلیغاتی: /nonspam
 
-     اگر هم نیاز به کمک یا اطلاعات بیشتر داری: /help"""
+     اگر هم نیاز به کمک یا اطلاعات بیشتر داری: /help
+     یا اگر می‌خوای درباره این پروژه بیشتر بدونی: /about
+     """
     update.message.reply_text(start_message)
 
 def cancel(bot, update):
@@ -56,9 +58,23 @@ def help(bot,  update):
     help_message = """
     ثبت پیام تبلیغاتی: /spam
     ثبت پیام غیر تبلیغاتی: /nonspam
-    آشنایی با هدف پروژه: /mission
+    آشنایی با هدف پروژه: /about
     """
     update.message.reply_text(help_message)
+
+def about(bot, update):
+    about_message = """
+    هدف این ربات چیه؟
+    قراره یه مجموعه داده از پیام هایی جمع کنیم که بدون رضایت ما برامون فرستاده می‌شه. مهم‌ترینشون هم اون پیامکهای تبلیغاتی ان که وقت و ناوقت میان و همه مون ازشون دل پری داریم :)
+    در نهایت این اطلاعات استفاده می‌شن تا یه نرم افزار پیامک تولید بشه که می‌تونه پیام های تبلیغاتی رو تشخیص بده.
+    اگر دوست دارید از این پروژه بیشتر بدونید،
+    یا اگر می‌خواید که به ما کمک کنید،
+    یا اگر متخصص هوش مصنوعی هستید و می‌خواید به این داده دسترسی داشته باشید،
+    برید اینجا:
+
+    https://github.com/payamQorbanpour/dejir
+    """
+    update.message.reply_text(about_message)
 
 def error(bot, update):
     """Log Errors caused by Updates."""
@@ -112,6 +128,9 @@ def main():
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("about", about))
+
+    ## TODO: is this one still needed?
     dp.add_handler(CommandHandler("nonspam", get_nonspam))
 
     dp.add_error_handler(error)
