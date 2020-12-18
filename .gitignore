@@ -1,4 +1,7 @@
+# Environments
 env/*
+.env
+
+# Database
 *.db
 *.db-journal
-.env
