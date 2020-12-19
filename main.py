@@ -1,7 +1,7 @@
 import os, logging
-import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
+from database import db_connection
 
 load_dotenv()
 
@@ -12,13 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 DEJIRBOT_TOKEN = os.getenv('DEJIRBOT_TOKEN')
-
-def db_connection():
-    with sqlite3.connect('dejirbot.db') as conn:
-        return conn
-
-def create_message_table():
-    c.execute('''CREATE TABLE message (id int, message text, label text, user_id int, is_approved bool, date text)''')
 
 def start(bot,  update):
     """Send a message when the command /start is issued."""
