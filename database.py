@@ -5,7 +5,7 @@ def db_connection():
         return conn
 
 def create_message_table():
-    query = "CREATE TABLE message (id int, message text, label text, user_id int, is_approved bool, date text)"
+    query = "CREATE TABLE IF NOT EXISTS message (id int, message text, label text, user_id int, is_approved bool, date text)"
     db_exec(query)
 
 def insert_message(msg, msg_type):
@@ -18,3 +18,7 @@ def db_exec(query):
     c.cursor().execute(query)
     c.commit()
     c.close()
+
+if __name__ == '__main__':
+    db_connection()
+    create_message_table()
