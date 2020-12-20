@@ -1,22 +1,20 @@
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Date, Integer, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
+import sqlite3
 
-engine = create_engine('sqlite:///dejirbot.db', echo=True)
-Base = declarative_base()
+def db_connection():
+    with sqlite3.connect('dejirbot.db') as conn:
+        return conn
 
-class MessageModel(Base):
+def create_message_table():
+    query = "CREATE TABLE message (id int, message text, label text, user_id int, is_approved bool, date text)"
+    db_exec(query)
 
-    __tablename__ = "message"
+def insert_message(msg, msg_type):
+    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','{msg_type}', '1', null, '{msg.date}')"
+    db_exec(query)
     
-    id = Column(Integer, primary_key=True)
-    message = Column(String)
-    label = Column(String)
-    user_id = Column(String)
-    is_approved = Column(Boolean)
-    date = Column(Date)
 
-    def __init__(self):
-        self.date = datetime.utcnow()
-
-Base.metadata.create_all(engine)
+def db_exec(query):
+    c = db_connection()
+    c.cursor().execute(query)
+    c.commit()
+    c.close()
