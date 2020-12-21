@@ -20,5 +20,4 @@ def db_exec(query):
     c.close()
 
 if __name__ == '__main__':
-    db_connection()
     create_message_table()
