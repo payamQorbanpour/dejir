@@ -9,7 +9,7 @@ def create_message_table():
     db_exec(query)
 
 def insert_message(msg, msg_type):
-    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','{msg_type}', '1', null, '{msg.date}')"
+    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','{msg_type}', '{msg.from_user.id}', null, '{msg.date}')"
     db_exec(query)
     
 
