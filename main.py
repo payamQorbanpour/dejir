@@ -1,7 +1,7 @@
 import os, logging
-import sqlite3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
+from database import insert_message
 
 load_dotenv()
 
@@ -12,13 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 DEJIRBOT_TOKEN = os.getenv('DEJIRBOT_TOKEN')
-
-def db_connection():
-    with sqlite3.connect('dejirbot.db') as conn:
-        return conn
-
-def create_message_table():
-    c.execute('''CREATE TABLE message (id int, message text, label text, user_id int, is_approved bool, date text)''')
 
 def start(bot,  update):
     """Send a message when the command /start is issued."""
@@ -42,13 +35,13 @@ def cancel(bot, update):
 msg = range(1)
 
 def spam_callback(bot, update):
-    insert_spam(update.message)
+    insert_message(update.message, update.message.from_user.id, "spam")
     spam_submit_message = "با تشکر پیام تبلیغاتی شما ثبت شد"
     update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
 def nonspam_callback(bot, update):
-    insert_nonspam(update.message)
+    insert_message(update.message, update.message.from_user.id, "nonspam")
     ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
     update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
@@ -90,22 +83,6 @@ def get_nonspam(bot, update):
     update.message.reply_text(get_ham_message)
     return msg
 
-def insert_spam(msg):
-    c = db_connection()
-
-    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','spam', '1', null, '{msg.date}')"
-    c.cursor().execute(query)
-    c.commit()
-    c.close()
-
-def insert_nonspam(msg):
-    c = db_connection()
-
-    query = f"INSERT INTO message VALUES ('{msg.message_id}','{msg.text}','nonspam', '1', null, '{msg.date}')"
-    c.cursor().execute(query)
-    c.commit()
-    c.close()
-
 def main():
     updater = Updater(DEJIRBOT_TOKEN, use_context=False)
 
@@ -129,9 +106,6 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("about", about))
-
-    ## TODO: is this one still needed?
-    dp.add_handler(CommandHandler("nonspam", get_nonspam))
 
     dp.add_error_handler(error)
 
