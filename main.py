@@ -35,13 +35,13 @@ def cancel(bot, update):
 msg = range(1)
 
 def spam_callback(bot, update):
-    insert_message(update.message, "spam")
+    insert_message(update.message, update.message.from_user.id, "spam")
     spam_submit_message = "با تشکر پیام تبلیغاتی شما ثبت شد"
     update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
 def nonspam_callback(bot, update):
-    insert_message(update.message, "nonspam")
+    insert_message(update.message, update.message.from_user.id, "nonspam")
     ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
     update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
