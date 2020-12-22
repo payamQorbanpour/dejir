@@ -19,7 +19,7 @@ def start(bot,  update):
     start_message = f"""سلام {user.first_name} \n
      با این دکمه‌ها می‌تونی کارو شروع کنی:\n
      ثبت پیام تبلیغاتی: /spam
-     ثبت پیام غیر تبلیغاتی: /nonspam
+     ثبت پیام غیر تبلیغاتی: /ham
 
      اگر هم نیاز به کمک یا اطلاعات بیشتر داری: /help
      یا اگر می‌خوای درباره این پروژه بیشتر بدونی: /about
@@ -40,8 +40,8 @@ def spam_callback(bot, update):
     update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
-def nonspam_callback(bot, update):
-    insert_message(update.message, update.message.from_user.id, "nonspam")
+def ham_callback(bot, update):
+    insert_message(update.message, update.message.from_user.id, "ham")
     ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
     update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
@@ -50,7 +50,7 @@ def help(bot,  update):
     """Send a message when the command /help is issued."""
     help_message = """
     ثبت پیام تبلیغاتی: /spam
-    ثبت پیام غیر تبلیغاتی: /nonspam
+    ثبت پیام غیر تبلیغاتی: /ham
     آشنایی با هدف پروژه: /about
     """
     update.message.reply_text(help_message)
@@ -78,7 +78,7 @@ def get_spam(bot, update):
     update.message.reply_text(get_spam_message)
     return msg
 
-def get_nonspam(bot, update):
+def get_ham(bot, update):
     get_ham_message = "لطفا پیام غیرتبلیغاتی رو وارد کن."
     update.message.reply_text(get_ham_message)
     return msg
@@ -94,14 +94,14 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-    nonspam_handler = ConversationHandler(
-        entry_points=[CommandHandler('nonspam', get_nonspam), ],
-        states={msg: [MessageHandler(Filters.text, nonspam_callback)]},
+    ham_handler = ConversationHandler(
+        entry_points=[CommandHandler('ham', get_ham), ],
+        states={msg: [MessageHandler(Filters.text, ham_callback)]},
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
     dp.add_handler(spam_handler)
-    dp.add_handler(nonspam_handler)
+    dp.add_handler(ham_handler)
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
