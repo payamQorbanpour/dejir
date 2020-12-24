@@ -35,20 +35,19 @@ def cancel(bot, update):
 # states
 msg = range(1)
 
+def encode_user_id(raw_user_id):
+    return sha256(str(raw_user_id).encode()).hexdigest()
+
 def spam_callback(bot, update):
-    raw_user_id = update.message.from_user.id
-    hash_user_id = sha256(str(raw_user_id).encode()).hexdigest()
-    
-    insert_message(update.message, hash_user_id, "spam")
+    user_id_hash = encode_user_id(update.message.from_user.id)
+    insert_message(update.message, user_id_hash, "spam")
     spam_submit_message = "با تشکر پیام تبلیغاتی شما ثبت شد"
     update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
 def ham_callback(bot, update):
-    raw_user_id = update.message.from_user.id
-    hash_user_id = sha256(str(raw_user_id).encode()).hexdigest()
-
-    insert_message(update.message, hash_user_id, "ham")
+    user_id_hash = encode_user_id(update.message.from_user.id)
+    insert_message(update.message, user_id_hash, "ham")
     ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
     update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
