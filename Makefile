@@ -6,3 +6,6 @@ install:
 
 init_db:
 	python database.py
+
+test:
+	python test.py
