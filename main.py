@@ -2,6 +2,7 @@ import os, logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from dotenv import load_dotenv
 from database import insert_message
+from hashlib import sha256
 
 load_dotenv()
 
@@ -34,14 +35,19 @@ def cancel(bot, update):
 # states
 msg = range(1)
 
+def encode_user_id(raw_user_id):
+    return sha256(str(raw_user_id).encode()).hexdigest()
+
 def spam_callback(bot, update):
-    insert_message(update.message, update.message.from_user.id, "spam")
+    user_id_hash = encode_user_id(update.message.from_user.id)
+    insert_message(update.message, user_id_hash, "spam")
     spam_submit_message = "با تشکر پیام تبلیغاتی شما ثبت شد"
     update.message.reply_text(spam_submit_message)
     return ConversationHandler.END
 
 def ham_callback(bot, update):
-    insert_message(update.message, update.message.from_user.id, "ham")
+    user_id_hash = encode_user_id(update.message.from_user.id)
+    insert_message(update.message, user_id_hash, "ham")
     ham_submit_message = "با تشکر پیام غیرتبلیغاتی شما ثبت شد"
     update.message.reply_text(ham_submit_message)
     return ConversationHandler.END
