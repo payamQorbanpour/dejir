@@ -1,5 +1,6 @@
 import os, logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler
 from dotenv import load_dotenv
 from database import insert_message
 from hashlib import sha256
@@ -14,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 DEJIRBOT_TOKEN = os.getenv('DEJIRBOT_TOKEN')
 
+def main_menu_keyboard():
+  keyboard = [[InlineKeyboardButton('پیام تبلیغاتی', callback_data='spam')],
+              [InlineKeyboardButton('پیام غیرتبلیغاتی', callback_data='ham')]]
+  return InlineKeyboardMarkup(keyboard)
+
 def start(bot,  update):
     """Send a message when the command /start is issued."""
     user = update.message.from_user
@@ -25,7 +31,7 @@ def start(bot,  update):
      اگر هم نیاز به کمک یا اطلاعات بیشتر داری: /help
      یا اگر می‌خوای درباره این پروژه بیشتر بدونی: /about
      """
-    update.message.reply_text(start_message)
+    update.message.reply_text(start_message, reply_markup=main_menu_keyboard())
 
 def cancel(bot, update):
     cancel_message = 'فرستادن پیام لغو شد.'
@@ -112,6 +118,10 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("about", about))
+
+    dp.add_handler(CallbackQueryHandler(get_spam, pattern='spam'))
+    dp.add_handler(CallbackQueryHandler(get_ham, pattern='ham'))
+    dp.add_error_handler(error)
 
     dp.add_error_handler(error)
 
